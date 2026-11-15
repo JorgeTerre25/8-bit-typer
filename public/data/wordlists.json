@@ -1,5 +1,47 @@
 {
-  "common": [],
-  "medieval": [],
-  "hard": []
+  "common": [
+    "the", "be", "and", "of", "a", "to", "in", "have", "it", "you",
+    "that", "for", "he", "with", "on", "do", "say", "this", "they", "at",
+    "but", "we", "his", "from", "not", "by", "she", "or", "as", "what",
+    "go", "their", "can", "who", "get", "if", "would", "her", "all", "my",
+    "make", "about", "know", "will", "up", "one", "time", "there", "year", "so",
+    "think", "when", "which", "them", "some", "me", "people", "take", "out", "into",
+    "just", "see", "him", "your", "come", "could", "now", "than", "like", "other",
+    "how", "then", "its", "our", "two", "more", "these", "want", "way", "look",
+    "first", "also", "new", "because", "day", "use", "no", "man", "find", "here",
+    "thing", "give", "many", "well", "only", "those", "tell", "very", "even", "back",
+    "any", "good", "woman", "through", "us", "life", "child", "work", "down", "may",
+    "after", "should", "call", "world", "over", "school", "still", "try", "last", "ask",
+    "need", "too", "feel", "three", "state", "never", "become", "between", "high",
+    "something", "most", "another", "much", "family", "own", "leave", "put", "old", "while",
+    "mean", "keep", "student", "why", "let", "great", "same", "big", "group", "begin",
+    "seem", "country", "help", "talk", "where", "turn", "problem", "every", "start", "hand",
+    "might", "show", "part", "against", "place", "such", "again", "few", "case", "week",
+    "company", "system", "each", "right", "program", "hear", "question", "during", "play", "government",
+    "run", "small", "number", "off", "always", "move", "night", "live", "point", "believe",
+    "hold", "today", "bring", "happen", "next", "without", "before", "large", "million", "must",
+    "home", "under", "water", "room", "write", "mother", "area", "national", "money", "story",
+    "young", "fact", "month", "different", "lot", "study", "book", "eye", "job", "word",
+    "though", "business", "issue", "side", "kind", "four", "head", "far", "black", "long",
+    "both", "little", "house", "yes", "since", "provide", "service", "around", "friend", "important",
+    "father", "sit", "away", "until", "power", "hour", "game", "often", "open", "walk",
+    "change", "door", "food", "morning", "love", "river", "tree", "road", "light", "music",
+    "beautiful", "carry", "close", "early", "easy", "face", "follow", "ground", "hard", "learn",
+    "letter", "listen", "meet", "near", "once", "paper", "party", "remember", "read",
+    "share", "street", "table", "together", "voice", "watch", "whole", "window"
+  ],
+  "medieval": [
+    "castle", "knight", "squire", "kingdom", "quest", "sword", "shield", "armor",
+    "tavern", "village", "king", "queen", "throne", "crown", "dragon", "wizard",
+    "ranger", "archer", "battle", "banner", "dungeon", "goblin", "skeleton", "potion",
+    "spell", "forge", "blacksmith", "horse", "steed", "moat", "tower", "royal",
+    "healer", "bard", "rune", "questing", "lantern", "scroll", "helmet", "gauntlet"
+  ],
+  "hard": [
+    "awkward", "zephyr", "rhythm", "sphinx", "knapsack", "jigsaw", "oxygen", "quartz",
+    "wizard", "jinx", "vortex", "glyph", "zealous", "complex", "crypt", "fjord",
+    "mnemonic", "queue", "whisk", "xylophone", "zigzag", "buzzing", "squeak", "quiver",
+    "thorough", "mystery", "syzygy", "pharaoh", "jockey", "exquisite", "strength", "twelfth",
+    "subtle", "island", "colonel", "receipt", "yacht", "pneumonia", "rhythmical", "bookkeeper"
+  ]
 }
