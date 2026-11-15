@@ -15,6 +15,15 @@ export interface WordData {
 
 export type TestStatus = "idle" | "running" | "finished";
 export type TestDuration = 15 | 30 | 60;
+export type ChampionId = "knight" | "wizard" | "archer";
+
+export interface Champion {
+  id: ChampionId;
+  name: string;
+  maxHealth: number;
+  description: string;
+  detail: string;
+}
 
 export interface TypingTestState {
   status: TestStatus;
@@ -25,6 +34,7 @@ export interface TypingTestState {
   activeWordIndex: number;
   activeCharIndex: number;
   startedAt: number | null;
+  mistakeCount: number;
 }
 
 export interface LiveStats {

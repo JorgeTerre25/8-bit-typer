@@ -37,6 +37,7 @@ function createInitialState(
     activeWordIndex: 0,
     activeCharIndex: 0,
     startedAt: null,
+    mistakeCount: 0,
     wordPool: initialBatch.wordPool,
     wordCursor: initialBatch.wordCursor,
     nextWordId: initialBatch.nextWordId,
@@ -79,7 +80,39 @@ function updateWord(
   return nextWords;
 }
 
-export function useTypingEngine(sourceWords: string[]) {
+function finishIfHealthIsEmpty(
+  state: EngineState,
+  maxMistakes: number,
+): EngineState {
+  if (
+    state.mistakeCount < maxMistakes ||
+    state.status !== "running" ||
+    state.startedAt === null
+  ) {
+    return state;
+  }
+
+  const elapsedMilliseconds = Math.min(
+    state.durationSeconds * 1000,
+    performance.now() - state.startedAt,
+  );
+  const remainingMilliseconds = Math.max(
+    0,
+    state.durationSeconds * 1000 - elapsedMilliseconds,
+  );
+
+  return {
+    ...state,
+    elapsedMilliseconds,
+    timeLeftSeconds: Math.ceil(remainingMilliseconds / 1000),
+    status: "finished",
+  };
+}
+
+export function useTypingEngine(
+  sourceWords: string[],
+  maxMistakes = Number.POSITIVE_INFINITY,
+) {
   const [game, setGame] = useState<EngineState>(() =>
     createInitialState(30, sourceWords),
   );
@@ -170,11 +203,13 @@ export function useTypingEngine(sourceWords: string[]) {
           return;
         }
 
+        let missedCount = 0;
         const characters = activeWord.characters.map((character) => {
           if (character.status !== "pending") {
             return character;
           }
 
+          missedCount += 1;
           return { ...character, status: "incorrect" as const, missed: true };
         });
         const completedWord = {
@@ -196,8 +231,14 @@ export function useTypingEngine(sourceWords: string[]) {
           ),
           activeWordIndex: nextGame.activeWordIndex + 1,
           activeCharIndex: 0,
+          mistakeCount: nextGame.mistakeCount + missedCount,
         };
-        commit(appendWordsIfNeeded(nextGame, sourceWords));
+        commit(
+          finishIfHealthIsEmpty(
+            appendWordsIfNeeded(nextGame, sourceWords),
+            maxMistakes,
+          ),
+        );
         return;
       }
 
@@ -218,11 +259,21 @@ export function useTypingEngine(sourceWords: string[]) {
         const targetCharacter = characters[nextGame.activeCharIndex];
         targetCharacter.status =
           targetCharacter.char === normalizedKey ? "correct" : "incorrect";
+        if (targetCharacter.status === "incorrect") {
+          nextGame = {
+            ...nextGame,
+            mistakeCount: nextGame.mistakeCount + 1,
+          };
+        }
       } else if (
         characters.filter((character) => character.status === "extra").length <
         MAX_EXTRA_CHARACTERS
       ) {
         characters.push({ char: normalizedKey, status: "extra" });
+        nextGame = {
+          ...nextGame,
+          mistakeCount: nextGame.mistakeCount + 1,
+        };
       } else {
         return;
       }
@@ -244,9 +295,9 @@ export function useTypingEngine(sourceWords: string[]) {
         ),
         activeCharIndex: nextGame.activeCharIndex + 1,
       };
-      commit(nextGame);
+      commit(finishIfHealthIsEmpty(nextGame, maxMistakes));
     },
-    [commit, sourceWords],
+    [commit, maxMistakes, sourceWords],
   );
 
   const setDuration = useCallback(
