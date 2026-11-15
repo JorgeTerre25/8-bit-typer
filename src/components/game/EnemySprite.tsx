@@ -1,34 +1,51 @@
-import { Bug, Ghost, Skull } from "lucide-react";
+import { Bug, Ghost, Skull, Swords } from "lucide-react";
 import type { LucideIcon } from "lucide-react";
+import type { BattleEnemy } from "../../types";
+import { HealthBar } from "./HealthBar";
 
-const enemies: { name: string; icon: LucideIcon; tone: string }[] = [
-  { name: "Goblin", icon: Bug, tone: "goblin" },
-  { name: "Skeleton", icon: Skull, tone: "skeleton" },
-  { name: "Wraith", icon: Ghost, tone: "wraith" },
-];
+const enemyIcons: Record<BattleEnemy["kind"], LucideIcon> = {
+  goblin: Bug,
+  skeleton: Skull,
+  wraith: Ghost,
+  miniBoss: Swords,
+};
 
 interface EnemySpriteProps {
-  enemyIndex: number;
+  enemy: BattleEnemy;
   word: string;
 }
 
-export function EnemySprite({ enemyIndex, word }: EnemySpriteProps) {
-  const enemy = enemies[enemyIndex % enemies.length];
-  const Icon = enemy.icon;
+export function EnemySprite({ enemy, word }: EnemySpriteProps) {
+  const Icon = enemyIcons[enemy.kind];
 
   return (
-    <div className={`enemy-card enemy-${enemy.tone}`}>
+    <div className={`enemy-card enemy-${enemy.kind}`}>
       <div className="enemy-card-heading">
-        <span>Enemy {String(enemyIndex + 1).padStart(2, "0")}</span>
-        <span className="enemy-intent">TARGET</span>
+        <span>
+          {enemy.kind === "miniBoss" ? "Mini-boss" : "Enemy"}{" "}
+          {String(enemy.encounter).padStart(2, "0")}
+        </span>
+        <span className="enemy-intent">ATK {enemy.damage}</span>
       </div>
-      <div className={`combat-portrait enemy-portrait portrait-${enemy.tone}`}>
+      <div
+        className={`combat-portrait enemy-portrait portrait-${enemy.kind}`}
+        role="img"
+        aria-label={enemy.name}
+      >
         <span className="portrait-rune" aria-hidden="true" />
         <Icon aria-hidden="true" size={76} strokeWidth={1.35} />
       </div>
       <h2>{enemy.name}</h2>
-      <p className="enemy-instruction">Defeat it by typing:</p>
-      <p className="enemy-word">{word}</p>
+      <HealthBar
+        current={enemy.health}
+        label="Enemy HP"
+        maximum={enemy.maxHealth}
+        tone={enemy.kind}
+      />
+      <p className="enemy-instruction">Type the assigned word:</p>
+      <p className="enemy-word" aria-label={`Word: ${word}`}>
+        {word}
+      </p>
     </div>
   );
 }

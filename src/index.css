@@ -489,7 +489,8 @@ kbd {
 
 .play-button:focus-visible,
 .back-button:focus-visible,
-.champion-card:focus-visible {
+.champion-card:focus-visible,
+.mode-card:focus-visible {
   outline: 2px solid #f1cf8c;
   outline-offset: 4px;
 }
@@ -650,6 +651,80 @@ kbd {
   text-align: center;
 }
 
+.mode-card-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 1.25rem;
+  max-width: 46rem;
+  margin: 0 auto;
+}
+
+.mode-card {
+  display: flex;
+  min-height: 19rem;
+  flex-direction: column;
+  align-items: center;
+  padding: 2rem 1.75rem 1.5rem;
+  border: 1px solid #403d32;
+  border-radius: 0.9rem;
+  background: linear-gradient(160deg, #22231d, #191a15 70%);
+  cursor: pointer;
+  text-align: center;
+  transition:
+    transform 150ms ease,
+    border-color 150ms ease,
+    background-color 150ms ease;
+}
+
+.mode-card:hover {
+  transform: translateY(-4px);
+  border-color: #9c7b48;
+  background: linear-gradient(160deg, #2b291f, #1d1e18 70%);
+}
+
+.mode-card-icon {
+  display: grid;
+  width: 4.5rem;
+  height: 4.5rem;
+  place-items: center;
+  margin-bottom: 1.25rem;
+  border: 1px solid #b6955a;
+  border-radius: 1.2rem;
+  background: rgb(201 169 107 / 7%);
+  color: #d8b576;
+}
+
+.typing-mode-card .mode-card-icon {
+  border-color: #72876a;
+  background: rgb(114 135 106 / 8%);
+  color: #a9c783;
+}
+
+.mode-card-title {
+  color: #eee8d7;
+  font-family: Georgia, "Times New Roman", serif;
+  font-size: 1.6rem;
+}
+
+.mode-card-description {
+  max-width: 18rem;
+  margin-top: 0.65rem;
+  color: #aaa494;
+  font-size: 0.9rem;
+  line-height: 1.6;
+}
+
+.mode-card-action {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.2rem;
+  margin-top: auto;
+  padding-top: 1.25rem;
+  color: #d2b579;
+  font-size: 0.8rem;
+  font-weight: 600;
+}
+
 .battle-header {
   margin-bottom: 1.5rem;
 }
@@ -661,6 +736,9 @@ kbd {
 }
 
 .menu-nav-button {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
   padding: 0.65rem 0.8rem;
   border: 1px solid transparent;
   border-radius: 0.45rem;
@@ -863,6 +941,23 @@ kbd {
   margin-bottom: 0.5rem;
 }
 
+.enemy-miniBoss .enemy-portrait {
+  border-width: 2px;
+  box-shadow:
+    0 0 1.5rem rgb(203 115 83 / 20%),
+    0 1rem 2rem rgb(0 0 0 / 22%),
+    inset 0 1px 0 rgb(255 255 255 / 7%);
+}
+
+.portrait-miniBoss {
+  color: #e4a070;
+  background-color: #35251e;
+}
+
+.health-miniBoss .health-fill {
+  background: linear-gradient(90deg, #874536, #df9362);
+}
+
 .portrait-goblin {
   color: #b9c282;
   background-color: #2a3022;
@@ -933,6 +1028,25 @@ kbd {
 
 .battle-typing-panel .typing-word {
   margin-right: 0;
+}
+
+.battle-word-timer {
+  display: flex;
+  align-items: center;
+  gap: 0.8rem;
+  margin-bottom: 1rem;
+}
+
+.battle-word-timer .timer-track {
+  height: 0.45rem;
+}
+
+.battle-word-timer .timer-fill {
+  background: linear-gradient(90deg, #c9a96b, #e1c47f);
+}
+
+.hero-battle-app .battle-result {
+  min-height: 4rem;
 }
 
 .battle-result {
@@ -1007,6 +1121,26 @@ kbd {
 
   .champion-grid {
     grid-template-columns: 1fr;
+  }
+
+  .mode-card-grid {
+    grid-template-columns: 1fr;
+    gap: 0.8rem;
+  }
+
+  .mode-card {
+    min-height: 0;
+    padding: 1.25rem;
+  }
+
+  .mode-card-icon {
+    width: 3.75rem;
+    height: 3.75rem;
+    margin-bottom: 0.75rem;
+  }
+
+  .mode-card-action {
+    padding-top: 0.85rem;
   }
 
   .class-heading {

@@ -37,7 +37,6 @@ function createInitialState(
     activeWordIndex: 0,
     activeCharIndex: 0,
     startedAt: null,
-    mistakeCount: 0,
     wordPool: initialBatch.wordPool,
     wordCursor: initialBatch.wordCursor,
     nextWordId: initialBatch.nextWordId,
@@ -80,38 +79,9 @@ function updateWord(
   return nextWords;
 }
 
-function finishIfHealthIsEmpty(
-  state: EngineState,
-  maxMistakes: number,
-): EngineState {
-  if (
-    state.mistakeCount < maxMistakes ||
-    state.status !== "running" ||
-    state.startedAt === null
-  ) {
-    return state;
-  }
-
-  const elapsedMilliseconds = Math.min(
-    state.durationSeconds * 1000,
-    performance.now() - state.startedAt,
-  );
-  const remainingMilliseconds = Math.max(
-    0,
-    state.durationSeconds * 1000 - elapsedMilliseconds,
-  );
-
-  return {
-    ...state,
-    elapsedMilliseconds,
-    timeLeftSeconds: Math.ceil(remainingMilliseconds / 1000),
-    status: "finished",
-  };
-}
-
 export function useTypingEngine(
   sourceWords: string[],
-  maxMistakes = Number.POSITIVE_INFINITY,
+  roundTimerEnabled = true,
 ) {
   const [game, setGame] = useState<EngineState>(() =>
     createInitialState(30, sourceWords),
@@ -130,6 +100,66 @@ export function useTypingEngine(
     [commit, sourceWords],
   );
 
+  const submitWord = useCallback(
+    (force = false): boolean | null => {
+      const current = gameRef.current;
+      if (
+        current.status === "finished" ||
+        (current.status === "idle" && !force)
+      ) {
+        return null;
+      }
+
+      const activeWord = current.words[current.activeWordIndex];
+      if (!activeWord) {
+        return null;
+      }
+
+      const expectedCharacters = activeWord.characters.filter(
+        (character) => character.status !== "extra",
+      );
+      const isCorrect =
+        current.activeCharIndex === expectedCharacters.length &&
+        expectedCharacters.length === activeWord.characters.length &&
+        expectedCharacters.every((character) => character.status === "correct");
+      const startedAt =
+        current.status === "idle" ? performance.now() : current.startedAt;
+      const characters = activeWord.characters.map((character) => {
+        if (character.status !== "pending") {
+          return character;
+        }
+
+        return { ...character, status: "incorrect" as const, missed: true };
+      });
+      const completedWord = {
+        ...activeWord,
+        characters,
+        isCompleted: true,
+        hasError: characters.some(
+          (character) =>
+            character.status === "incorrect" ||
+            character.status === "extra",
+        ),
+      };
+      const nextGame = {
+        ...current,
+        status: "running" as const,
+        startedAt,
+        words: updateWord(
+          current.words,
+          current.activeWordIndex,
+          completedWord,
+        ),
+        activeWordIndex: current.activeWordIndex + 1,
+        activeCharIndex: 0,
+      };
+
+      commit(appendWordsIfNeeded(nextGame, sourceWords));
+      return isCorrect;
+    },
+    [commit, sourceWords],
+  );
+
   const handleKey = useCallback(
     (key: string) => {
       const current = gameRef.current;
@@ -139,6 +169,11 @@ export function useTypingEngine(
 
       const isLetter = /^[a-z]$/i.test(key);
       if (key !== " " && key !== "Backspace" && !isLetter) {
+        return;
+      }
+
+      if (key === " ") {
+        submitWord();
         return;
       }
 
@@ -197,51 +232,6 @@ export function useTypingEngine(
         return;
       }
 
-      if (key === " ") {
-        const activeWord = nextGame.words[nextGame.activeWordIndex];
-        if (!activeWord) {
-          return;
-        }
-
-        let missedCount = 0;
-        const characters = activeWord.characters.map((character) => {
-          if (character.status !== "pending") {
-            return character;
-          }
-
-          missedCount += 1;
-          return { ...character, status: "incorrect" as const, missed: true };
-        });
-        const completedWord = {
-          ...activeWord,
-          characters,
-          isCompleted: true,
-          hasError: characters.some(
-            (character) =>
-              character.status === "incorrect" ||
-              character.status === "extra",
-          ),
-        };
-        nextGame = {
-          ...nextGame,
-          words: updateWord(
-            nextGame.words,
-            nextGame.activeWordIndex,
-            completedWord,
-          ),
-          activeWordIndex: nextGame.activeWordIndex + 1,
-          activeCharIndex: 0,
-          mistakeCount: nextGame.mistakeCount + missedCount,
-        };
-        commit(
-          finishIfHealthIsEmpty(
-            appendWordsIfNeeded(nextGame, sourceWords),
-            maxMistakes,
-          ),
-        );
-        return;
-      }
-
       const activeWord = nextGame.words[nextGame.activeWordIndex];
       if (!activeWord) {
         return;
@@ -259,21 +249,11 @@ export function useTypingEngine(
         const targetCharacter = characters[nextGame.activeCharIndex];
         targetCharacter.status =
           targetCharacter.char === normalizedKey ? "correct" : "incorrect";
-        if (targetCharacter.status === "incorrect") {
-          nextGame = {
-            ...nextGame,
-            mistakeCount: nextGame.mistakeCount + 1,
-          };
-        }
       } else if (
         characters.filter((character) => character.status === "extra").length <
         MAX_EXTRA_CHARACTERS
       ) {
         characters.push({ char: normalizedKey, status: "extra" });
-        nextGame = {
-          ...nextGame,
-          mistakeCount: nextGame.mistakeCount + 1,
-        };
       } else {
         return;
       }
@@ -295,9 +275,9 @@ export function useTypingEngine(
         ),
         activeCharIndex: nextGame.activeCharIndex + 1,
       };
-      commit(finishIfHealthIsEmpty(nextGame, maxMistakes));
+      commit(nextGame);
     },
-    [commit, maxMistakes, sourceWords],
+    [commit, submitWord],
   );
 
   const setDuration = useCallback(
@@ -305,8 +285,38 @@ export function useTypingEngine(
     [reset],
   );
 
+  const finish = useCallback(() => {
+    const current = gameRef.current;
+    if (current.status === "finished") {
+      return;
+    }
+
+    const elapsedMilliseconds =
+      roundTimerEnabled && current.startedAt !== null
+        ? Math.min(
+            current.durationSeconds * 1000,
+            performance.now() - current.startedAt,
+          )
+        : current.elapsedMilliseconds;
+    const remainingMilliseconds = Math.max(
+      0,
+      current.durationSeconds * 1000 - elapsedMilliseconds,
+    );
+
+    commit({
+      ...current,
+      elapsedMilliseconds,
+      timeLeftSeconds: Math.ceil(remainingMilliseconds / 1000),
+      status: "finished",
+    });
+  }, [commit, roundTimerEnabled]);
+
   useEffect(() => {
-    if (game.status !== "running" || game.startedAt === null) {
+    if (
+      !roundTimerEnabled ||
+      game.status !== "running" ||
+      game.startedAt === null
+    ) {
       return;
     }
 
@@ -333,11 +343,19 @@ export function useTypingEngine(
     const timerId = window.setInterval(updateClock, 100);
     updateClock();
     return () => window.clearInterval(timerId);
-  }, [commit, game.durationSeconds, game.startedAt, game.status]);
+  }, [
+    commit,
+    game.durationSeconds,
+    game.startedAt,
+    game.status,
+    roundTimerEnabled,
+  ]);
 
   return {
     ...game,
     handleKey,
+    submitWord,
+    finish,
     reset,
     setDuration,
   };

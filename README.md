@@ -1,5 +1,5 @@
-# 8-bit-typer
-A cozy medieval typing test built with React and TypeScript—featuring typing analytics and spell-to-slay fantasy combat.
+# Medieval Typer
+A medieval typing game built with React and TypeScript, with a classic timed test and a separate hero-combat mode.
 
 ## Getting started
 
@@ -10,21 +10,30 @@ npm run dev
 
 Run `npm run build` to type-check the project and create a production build.
 
-## Try the typing test
+## Play
 
 1. Run `npm run dev` and open the local URL printed by Vite.
-2. Select **Play**, then choose Knight (150 HP), Wizard (80 HP), or Archer (120 HP).
-3. Choose a 15, 30, or 60 second battle.
-4. Type the word assigned to the enemy and press Space to defeat it. Each wrong or skipped letter costs 10 HP.
-5. Try an incorrect letter or skip a word to see the health bar change. Survive until the timer ends, or lose when health reaches zero.
+2. Select **Play**, then choose **Hero Mode** or **Typing Test**.
+3. In Typing Test, choose a 15, 30, or 60 second round. The timer begins with your first letter.
+4. In Hero Mode, choose a champion and type the enemy's word before its per-word timer expires. Press Space to submit; Backspace corrects a typo.
 
-Each class starts with its listed maximum health. The word list contains 286 common words; more words are appended as you approach the end of the queue.
+Hero Mode rules:
+
+- Knight starts with 150 HP, deals 25 damage, and gets average-length words.
+- Wizard starts with 80 HP, deals 40 damage, and gets longer words.
+- Archer starts with 120 HP, deals 15 damage, and has a 10% chance to hit twice; its words mix both lengths.
+- Correct words damage the enemy. Failed or expired words let the same enemy attack; a typo can be corrected before submission.
+- Regular enemies allow 5 seconds per word.
+- Goblins have 45–70 HP and deal 8–14 damage; skeletons have 65–95 HP and deal 12–18; wraiths have 85–120 HP and deal 16–24.
+- Every 10th encounter is an Ogre Warlord mini-boss with 180–240 HP, 20–30 damage, extra-difficult words from the hard word list, and 3 seconds per word.
+
+The common word list contains 286 words and is queued dynamically during typing tests.
 
 ## Project structure
 
 - `public/assets/` — fonts, sounds, and sprites
 - `public/data/` — static game data and word lists
-- `src/components/menu/` — main menu and champion selection
+- `src/components/menu/` — main menu, mode selection, and champion selection
 - `src/components/typing/` — typing test interface
 - `src/components/results/` — post-test analytics
 - `src/components/game/` — RPG battle interface

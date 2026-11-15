@@ -1,5 +1,5 @@
 import { Swords } from "lucide-react";
-import type { Champion } from "../../types";
+import type { BattleEnemy, Champion } from "../../types";
 import { EnemySprite } from "./EnemySprite";
 import { HealthBar } from "./HealthBar";
 import { HeroSprite } from "./HeroSprite";
@@ -7,7 +7,7 @@ import { HeroSprite } from "./HeroSprite";
 interface BattleArenaProps {
   champion: Champion;
   health: number;
-  enemyIndex: number;
+  enemy: BattleEnemy;
   enemyWord: string;
   defeatedCount: number;
 }
@@ -15,7 +15,7 @@ interface BattleArenaProps {
 export function BattleArena({
   champion,
   health,
-  enemyIndex,
+  enemy,
   enemyWord,
   defeatedCount,
 }: BattleArenaProps) {
@@ -42,7 +42,7 @@ export function BattleArena({
       </div>
 
       <div className="battle-side enemy-side">
-        <EnemySprite enemyIndex={enemyIndex} word={enemyWord} />
+        <EnemySprite enemy={enemy} word={enemyWord} />
       </div>
 
       <div className="defeated-counter" aria-live="polite">

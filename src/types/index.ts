@@ -21,8 +21,22 @@ export interface Champion {
   id: ChampionId;
   name: string;
   maxHealth: number;
+  attackDamage: number;
+  doubleHitChance: number;
+  wordProfile: "average" | "lengthy" | "mixed";
   description: string;
   detail: string;
+}
+
+export type EnemyKind = "goblin" | "skeleton" | "wraith" | "miniBoss";
+
+export interface BattleEnemy {
+  encounter: number;
+  kind: EnemyKind;
+  name: string;
+  health: number;
+  maxHealth: number;
+  damage: number;
 }
 
 export interface TypingTestState {
@@ -34,7 +48,6 @@ export interface TypingTestState {
   activeWordIndex: number;
   activeCharIndex: number;
   startedAt: number | null;
-  mistakeCount: number;
 }
 
 export interface LiveStats {

@@ -20,7 +20,7 @@ export function CharacterSelect({ onBack, onSelect }: CharacterSelectProps) {
       <section aria-labelledby="class-title" className="class-screen">
         <button className="back-button" onClick={onBack} type="button">
           <ArrowLeft aria-hidden="true" size={17} />
-          <span>Main menu</span>
+          <span>Back to modes</span>
         </button>
 
         <header className="class-heading">
@@ -61,8 +61,8 @@ export function CharacterSelect({ onBack, onSelect }: CharacterSelectProps) {
         </div>
 
         <p className="class-note">
-          Your class determines your health. Every champion faces the same
-          enemies.
+          Your class determines your health, attack strength, and word length.
+          Every 10th encounter is a mini-boss.
         </p>
       </section>
     </main>
